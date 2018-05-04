@@ -1,0 +1,15 @@
+#root {
+  text-align: center; }
+
+.game {
+  padding-top: 100px; }
+
+.square {
+  width: 50px;
+  height: 50px; }
+  .square.black {
+    background: #000; }
+  .square.white {
+    background: #fff; }
+  .square:hover {
+    background: green; }
