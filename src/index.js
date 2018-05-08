@@ -27,6 +27,7 @@ const Moves = Object.freeze({
 	Pawn_Diagonal: 3,
 	Knight: 4,
 	Diagonal: 5,
+	King: 6
 })
 
 const piece_obj = {
@@ -137,7 +138,8 @@ const piece_obj = {
 					path={path}
 				/>
 			)
-		}
+		},
+		possibleMoves: [Moves.King]
 	},
 	Pw: {
 		id: 'Pw',
@@ -177,6 +179,166 @@ const piece_obj = {
 			},
 		],
 		path: pawn_white,
+		component: function(position, path) {
+			return (
+				<Rook 
+					position={position} 
+					path={path}
+				/>
+			)
+		},
+		possibleMoves: [Moves.Up, Moves.Pawn_Diagonal]
+	},
+
+
+	Rb: {
+		id: 'Rb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 0,
+				y: 0
+			},
+			{
+				x: 0,
+				y: 7
+			}
+		],
+		path: rook_black,
+		component: function(position, path) {
+			return (
+				<Rook position={position}
+						path={path}
+				 />
+			)
+		},
+		possibleMoves: [Moves.Vertical, Moves.Horizontal]
+	},
+	Nb: {
+		id: 'Nb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 0,
+				y: 1
+			},
+			{
+				x: 0,
+				y: 6
+			}
+		],
+		path: knight_black,
+		component: function(position, path) {
+			return (
+				<ChessPiece 
+					position={position}
+					path={path}
+				/>
+			)
+		},
+		possibleMoves: [Moves.Knight]
+	},
+	Bb: {
+		id: 'Bb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 0,
+				y: 2
+			},
+			{
+				x: 0,
+				y: 5
+			}
+		],
+		path: bishop_black,
+		component: function(position, path) {
+			return (
+				<Rook position={position} 
+					path={path}
+				/>
+			)
+		},
+		possibleMoves: [Moves.Diagonal]
+	},
+	Qb: {
+		id: 'Qb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 0,
+				y: 3
+			}
+		],
+		path: queen_black,
+		component: function(position, path) {
+			return (
+				<Rook 
+					position={position} 
+					path={path}
+				/>
+			)
+		},
+		possibleMoves: [Moves.Diagonal, Moves.Vertical, Moves.Horizontal]
+	},
+	Kb: {
+		id: 'Kb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 0,
+				y: 4
+			}
+		],
+		path: king_black,
+		component: function(position, path) {
+			return (
+				<Rook 
+					position={position} 
+					path={path}
+				/>
+			)
+		},
+		possibleMoves: [Moves.King]
+	},
+	Pb: {
+		id: 'Pb',
+		color: 'black',
+		starting_pos: [
+			{
+				x: 1,
+				y: 0
+			},
+			{
+				x: 1,
+				y: 1
+			},
+			{
+				x: 1,
+				y: 2
+			},
+			{
+				x: 1,
+				y: 3
+			},
+			{
+				x: 1,
+				y: 4
+			},
+			{
+				x: 1,
+				y: 5
+			},
+			{
+				x: 1,
+				y: 6
+			},
+			{
+				x: 1,
+				y: 7
+			},
+		],
+		path: pawn_black,
 		component: function(position, path) {
 			return (
 				<Rook 
@@ -328,6 +490,7 @@ class Board extends React.Component {
 			//mark possible move squares
 			const squares = this.state.squares.slice();
 			let new_moves = [];
+			let self = this;
 			for (let move of possibleMoves) {
 				switch(move) {
 					case Moves.Vertical: //find possible vertical moves
@@ -425,8 +588,6 @@ class Board extends React.Component {
 						}
 						break;
 					case Moves.Knight:
-						let self = this;
-
 						const positions = [
 							{
 								x: parseInt(curr_pos[0]) - 2,
@@ -549,6 +710,53 @@ class Board extends React.Component {
 							x++;
 							y--;
 						}
+
+						break;
+					case Moves.King:
+						const king_positions = [
+							{
+								x: parseInt(curr_pos[0]) - 1,
+								y: parseInt(curr_pos[1])
+							},
+							{
+								x: parseInt(curr_pos[0]) - 1,
+								y: parseInt(curr_pos[1]) + 1
+							},
+							{
+								x: parseInt(curr_pos[0]),
+								y: parseInt(curr_pos[1]) + 1
+							},
+							{
+								x: parseInt(curr_pos[0]) + 1,
+								y: parseInt(curr_pos[1]) + 1
+							},
+							{
+								x: parseInt(curr_pos[0]) + 1,
+								y: parseInt(curr_pos[1])
+							},
+							{
+								x: parseInt(curr_pos[0]) + 1,
+								y: parseInt(curr_pos[1]) - 1
+							},
+							{
+								x: parseInt(curr_pos[0]),
+								y: parseInt(curr_pos[1]) - 1
+							},
+							{
+								x: parseInt(curr_pos[0]) - 1,
+								y: parseInt(curr_pos[1]) - 1
+							},
+						];
+						king_positions.forEach(function(position) {
+							if(self.canMoveToSquare(squares, position.x, position.y, moving_piece.color)) {
+								self.addMoveSquare(squares, position.x, position.y);
+
+								new_moves.push({
+									x: position.x,
+									y: position.y
+								});
+							}
+						});
 
 						break;
 				}

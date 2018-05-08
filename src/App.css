@@ -19,7 +19,7 @@
   .square.white {
     background: #fff; }
   .square:hover {
-    background: #8e6161; }
+    background: #dca593; }
 
 .board-row {
   display: flex; }
