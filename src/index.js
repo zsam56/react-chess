@@ -23,11 +23,10 @@ import registerServiceWorker from './registerServiceWorker';
 const Moves = Object.freeze({
 	Vertical: 0,
 	Horizontal: 1,
-	Up: 2,
-	Pawn_Diagonal: 3,
-	Knight: 4,
-	Diagonal: 5,
-	King: 6
+	Pawn: 2,
+	Knight: 3,
+	Diagonal: 4,
+	King: 5
 })
 
 const piece_obj = {
@@ -187,7 +186,7 @@ const piece_obj = {
 				/>
 			)
 		},
-		possibleMoves: [Moves.Up, Moves.Pawn_Diagonal]
+		possibleMoves: [Moves.Pawn]
 	},
 
 
@@ -347,7 +346,7 @@ const piece_obj = {
 				/>
 			)
 		},
-		possibleMoves: [Moves.Up, Moves.Pawn_Diagonal]
+		possibleMoves: [Moves.Pawn]
 	}
 }
 
@@ -430,13 +429,15 @@ class Square extends React.PureComponent {
 class Board extends React.Component {
 	constructor(props) {
 		super(props);
+
+		//initialize board array
 		let rows = new Array(8).fill(0);
 		for (let i = 0; i < 8; i++) {
 			rows[i] = new Array(8).fill(
 				{
 					piece: '',
 					piece_color: '',
-					move: false
+					move: false,
 				}
 			);
 		}
@@ -455,7 +456,15 @@ class Board extends React.Component {
 		this.state = {
 			squares: squares,
 			moving: false,
-			move_square: {}
+			move_square: {},
+			black_king_pos: {
+				x: 0,
+				y: 4
+			},
+			white_king_pos: {
+				x: 7,
+				y: 4
+			}
 		};
 	}
 
@@ -475,8 +484,219 @@ class Board extends React.Component {
 		)
 	}
 
+	isInCheck() {
+		//check if white king is in check
+		const white_king_pos = this.state.white_king_pos;
+		let squares = this.state.squares.slice();
+		let curr_x = parseInt(white_king_pos.x);
+		let curr_y = parseInt(white_king_pos.y);
+
+		//search on the horizontal rank
+		curr_y = parseInt(white_king_pos.y) - 1;
+		while(curr_y >= 0 && squares[curr_x][curr_y].piece === '') {
+			curr_y--;
+		}
+		if (curr_y != -1) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Horizontal)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_y = parseInt(white_king_pos.y) + 1;
+		while(curr_y < 8 && squares[curr_x][curr_y].piece === '') {
+			curr_y++;
+		}
+		if (curr_y != 8) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Horizontal)) {
+					alert('check');
+				}
+			}
+		}
+
+		//search on vertical rank
+		curr_y = parseInt(white_king_pos.y);
+		curr_x = parseInt(white_king_pos.x) - 1;
+		while(curr_x >= 0 && squares[curr_x][curr_y].piece === '') {
+			curr_x--;
+		}
+		if (curr_x != -1) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Vertical)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_x = parseInt(white_king_pos.y) + 1;
+		while(curr_x < 8 && squares[curr_x][curr_y].piece === '') {
+			curr_x++;
+		}
+		if (curr_x != 8) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Vertical)) {
+					alert('check');
+				}
+			}
+		}
+
+		//search on the diagonal
+		curr_y = parseInt(white_king_pos.y) + 1;
+		curr_x = parseInt(white_king_pos.x) - 1;
+		while(curr_x >= 0 && curr_y < 8 && squares[curr_x][curr_y].piece === '') {
+			curr_x--;
+			curr_y++;
+		}
+		if (curr_x != -1 && curr_y != 8) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Diagonal)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_y = parseInt(white_king_pos.y) - 1;
+		curr_x = parseInt(white_king_pos.x) - 1;
+		while(curr_x >= 0 && curr_y >= 0 && squares[curr_x][curr_y].piece === '') {
+			curr_x--;
+			curr_y--;
+		}
+		if (curr_x != -1 && curr_y != -1) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Diagonal)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_y = parseInt(white_king_pos.y) + 1;
+		curr_x = parseInt(white_king_pos.x) + 1;
+		while(curr_x < 8 && curr_y < 8 && squares[curr_x][curr_y].piece === '') {
+			curr_x++;
+			curr_y++;
+		}
+		if (curr_x != 8 && curr_y != 8) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Diagonal)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_y = parseInt(white_king_pos.y) - 1;
+		curr_x = parseInt(white_king_pos.x) + 1;
+		while(curr_x < 8 && curr_y >= 0 && squares[curr_x][curr_y].piece === '') {
+			curr_x++;
+			curr_y--;
+		}
+		if (curr_x != 8 && curr_y != -1) {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Diagonal)) {
+					alert('check');
+				}
+			}
+		}
+
+		//knight
+		const knight_positions = [
+			{
+				x: parseInt(white_king_pos.x) - 2,
+				y: parseInt(white_king_pos.y) + 1
+			},
+			{
+				x: parseInt(white_king_pos.x) - 1,
+				y: parseInt(white_king_pos.y) + 2
+			},
+			{
+				x: parseInt(white_king_pos.x) - 2,
+				y: parseInt(white_king_pos.y) - 1
+			},
+			{
+				x: parseInt(white_king_pos.x) + 1,
+				y: parseInt(white_king_pos.y) + 2
+			},
+			{
+				x: parseInt(white_king_pos.x) + 2,
+				y: parseInt(white_king_pos.y) + 1
+			},
+			{
+				x: parseInt(white_king_pos.x) - 1,
+				y: parseInt(white_king_pos.y) - 2
+			},
+			{
+				x: parseInt(white_king_pos.x) + 1,
+				y: parseInt(white_king_pos.y) - 2
+			},
+			{
+				x: parseInt(white_king_pos.x) + 2,
+				y: parseInt(white_king_pos.y) - 1
+			},
+		];
+
+		knight_positions.forEach(function(position) {
+			if(position.x >= 0 && position.x < 8 &&
+				position.y >=0 && position.y < 8 &&
+				squares[position.x][position.y].piece !== '') {
+				let pieceData = squares[position.x][position.y];
+				let piece = piece_obj[pieceData.piece];
+				if (piece.color != 'white') {
+					if (piece.possibleMoves.includes(Moves.Knight)) {
+						alert('check');
+					}
+				}
+			}
+		});
+
+		//pawn positions
+		curr_y = parseInt(white_king_pos.y) - 1;
+		curr_x = parseInt(white_king_pos.x) - 1;
+		if (curr_x >= 0 && curr_y >= 0 && squares[curr_x][curr_y].piece !== '') {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Pawn)) {
+					alert('check');
+				}
+			}
+		}
+
+		curr_y = parseInt(white_king_pos.y) + 1;
+		if (curr_x >= 0 && curr_y < 8 && squares[curr_x][curr_y].piece !== '') {
+			let pieceData = squares[curr_x][curr_y];
+			let piece = piece_obj[pieceData.piece];
+			if (piece.color != 'white') {
+				if (piece.possibleMoves.includes(Moves.Pawn)) {
+					alert('check');
+				}
+			}
+		}
+
+	}
+
+	isHorizontalCheck() {
+
+	}
+
 	handleClick = (squareData) => {
-		if (!this.state.moving) {
+		if (!this.state.moving) { //starting to move
 			let moving_piece = squareData.piece;
 
 			if (moving_piece === '') {
@@ -493,7 +713,7 @@ class Board extends React.Component {
 			let self = this;
 			for (let move of possibleMoves) {
 				switch(move) {
-					case Moves.Vertical: //find possible vertical moves
+					case Moves.Vertical:
 						//get moves going up
 						let x = parseInt(curr_pos[0]) - 1;
 						let y = parseInt(curr_pos[1]);
@@ -567,7 +787,7 @@ class Board extends React.Component {
 						}
 
 						break;
-					case Moves.Up: //find possible moves for going up
+					case Moves.Pawn:
 						if (moving_piece.color === 'white') {
 							x = parseInt(curr_pos[0]) - 1;
 						} else {
@@ -575,17 +795,52 @@ class Board extends React.Component {
 						}
 						y = parseInt(curr_pos[1]);
 
-						if (squares[x][y].piece === '') {
+						if (x >= 0 && x < 8 &&
+							y >= 0 && y < 8 && 
+							squares[x][y].piece === '') {
 							//add square as a possible move
-							let square_obj = squares[x][y];
-							let new_square_obj = {...square_obj, move: true};
-							squares[x][y] = new_square_obj;
+							self.addMoveSquare(squares, x, y);
 
 							new_moves.push({
 								x: x,
 								y: y
 							});
 						}
+
+						//pawn diagonal
+						if (moving_piece.color === 'white') {
+							x = parseInt(curr_pos[0]) - 1;
+						} else {
+							x = parseInt(curr_pos[0]) + 1;
+						}
+						y = parseInt(curr_pos[1]) + 1;
+						if (x >= 0 && x < 8 &&
+							y >= 0 && y < 8 && 
+							squares[x][y].piece !== '' &&
+							squares[x][y].piece_color !== moving_piece.color) {
+							//add square as a possible move
+							self.addMoveSquare(squares, x, y);
+
+							new_moves.push({
+								x: x,
+								y: y
+							});
+						}
+
+						y = parseInt(curr_pos[1]) - 1;
+						if (x >= 0 && x < 8 &&
+							y >= 0 && y < 8 && 
+							squares[x][y].piece !== '' &&
+							squares[x][y].piece_color !== moving_piece.color) {
+							//add square as a possible move
+							self.addMoveSquare(squares, x, y);
+
+							new_moves.push({
+								x: x,
+								y: y
+							});
+						}
+
 						break;
 					case Moves.Knight:
 						const positions = [
@@ -762,13 +1017,14 @@ class Board extends React.Component {
 				}
 			}
 
+			//set the state
 			this.setState({
 				squares: squares,
 				moving: true,
 				move_square: squareData,
 				moves: new_moves
 			});
-		} else {
+		} else { //perform the move
 			let from_pos = this.state.move_square.id.split('-');
 			let to_pos = squareData.id.split('-');
 
@@ -781,6 +1037,7 @@ class Board extends React.Component {
 			}
 
 			const squares = this.state.squares.slice();
+			let has_moved = false;
 			if (can_move) {
 				//remove the piece from the from square
 				let from_obj = squares[from_pos[0]][from_pos[1]];
@@ -791,6 +1048,8 @@ class Board extends React.Component {
 				let to_obj = squares[to_pos[0]][to_pos[1]];
 				let new_to_obj = {...to_obj, piece: this.state.move_square.piece.id, piece_color: this.state.move_square.piece.color};
 				squares[to_pos[0]][to_pos[1]] = new_to_obj;
+
+				has_moved = true;
 			}
 
 			//remove move symbols
@@ -802,11 +1061,45 @@ class Board extends React.Component {
 				}
 			}
 
-			this.setState({
-				squares: squares, 
-				moving: false, 
-				move_square: {}
-			});
+			if (has_moved) {
+				//if king has moved update king position
+				if (this.state.move_square.piece.id === 'Kw'
+					|| this.state.move_square.piece.id === 'Kb') {
+					let king_position;
+					king_position = {
+						x: parseInt(to_pos[0]),
+						y: parseInt(to_pos[1])
+					}
+
+					if (this.state.move_square.piece.id === 'Kw') {
+						this.setState({
+							squares: squares, 
+							moving: false, 
+							move_square: {},
+							white_king_pos: king_position
+						});
+					} else if (this.state.move_square.piece.id === 'Kb') {
+						this.setState({
+							squares: squares, 
+							moving: false, 
+							move_square: {},
+							black_king_pos: king_position
+						});
+					}
+				} else {
+					this.setState({
+						squares: squares, 
+						moving: false, 
+						move_square: {}
+					});
+				}
+			} else {
+				this.setState({
+					squares: squares, 
+					moving: false, 
+					move_square: {}
+				});
+			}
 		}
 	}
 
@@ -877,6 +1170,13 @@ class Board extends React.Component {
 		return board;
 	}
 
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		//check for check
+		if (prevState.moving) {//if we have just moved
+			this.isInCheck();
+		}
+	}
+
 	render() {
 
 		return (
@@ -888,15 +1188,26 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
+	constructor(props){
+		super(props);
+		this.state = {
+			black_check: false,
+			white_check: false
+		};
+	}
+
+	updateInfo() {
+
+	}
 
 	render() {
 		return (
 			<div className="game">
 				<div className="game-board">
-		  			<Board />
+		  			<Board updateInfo={this.updateInfo}/>
 				</div>
 				<div className="game-info">
-		  			<div>{/* status */}</div>
+		  			<div>{}</div>
 		  			<ol>{/* TODO */}</ol>
 				</div>
 			</div>
