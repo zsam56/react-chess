@@ -5,11 +5,13 @@
   text-align: center; }
 
 .game {
-  padding-top: 100px; }
+  display: flex;
+  padding: 50px; }
 
 .game-board {
   display: inline-block;
-  border: 1px solid black; }
+  border: 1px solid black;
+  margin: 0 auto; }
 
 .square {
   width: 75px;
@@ -51,3 +53,9 @@
   position: absolute;
   top: 12px;
   left: 12px; }
+
+.game-info {
+  border: 1px solid black; }
+
+.game-info-header {
+  border-bottom: 1px solid black; }
